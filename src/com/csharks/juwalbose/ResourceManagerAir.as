@@ -96,7 +96,7 @@ package com.csharks.juwalbose
 		}
 		private static function creationComplete(result:String):void {  
 			if(result=="success"){
-				initialised=true;
+				//initialised=true;
 				saveAtlas();
 			}
 			DynamicAtlasCreator.creationComplete.remove(creationComplete);
@@ -123,7 +123,8 @@ package com.csharks.juwalbose
 			DynamicAtlasCreator.creationComplete.add(creationComplete);
 			DynamicAtlasCreator.createFrom(XhdpiPng.bitmapData,data,scaleRatio,assets,atlasName);
 		}
-		private static function saveAtlas():void{
+		private static function saveAtlas():void{//Users/<userName>/Library/Application Support/<applicationID>/Local Store
+			trace("saving atlas");
 			file=File.applicationStorageDirectory.resolvePath(atlasName+scaleRatio.toString()+".xml");
 			var filestream:FileStream=new FileStream();
 			filestream.open(file,FileMode.WRITE);
@@ -146,6 +147,9 @@ package com.csharks.juwalbose
 			
 			//dispose explicitly
 			DynamicAtlasCreator.dispose();
+			
+			//load Now
+			loadSavedAtlas();
 		}
 		private static function loadSavedAtlas():void{
 			trace("loading saved atlas");

@@ -46,6 +46,7 @@ package com.csharks.juwalbose.utils
 	
 	import starling.textures.Texture;
 	import starling.utils.AssetManager;
+	
 
 	/**
 	 * Class helps create starling textures for any size based on a 2048 based texture atlas.
@@ -67,7 +68,8 @@ package com.csharks.juwalbose.utils
 		
 		private static var customAtlas:Texture;
 		private static var assets:AssetManager;
-		
+		private static var originalXML:XML;
+		private static var useTextureFrames:Boolean=true;
 		/**
 		 * Enable for supporting 4096 textures, but not all devices support it
 		 */
@@ -107,6 +109,9 @@ package com.csharks.juwalbose.utils
 			if(scaleRatio>1){
 				scaleRatio=1;
 			}
+			if(useTextureFrames){
+				originalXML=atlasXml;
+			}
 			assets=assetManager;
 			saveName=atlasName;
 			totalTextures = atlasXml.SubTexture.length();   
@@ -139,7 +144,7 @@ package com.csharks.juwalbose.utils
 				clipping = new Rectangle(x, y, width, height); 
 				pt.x=pt.y=0;
 				
-				if(frameWidth!=0&&frameHeight!=0){
+				if(!useTextureFrames && frameWidth!=0 && frameHeight!=0){
 					bData=new BitmapData(frameWidth,frameHeight,true,0x000000);
 					pt.x=-1*frameX;
 					pt.y=-1*frameY;
@@ -147,9 +152,13 @@ package com.csharks.juwalbose.utils
 					bData=new BitmapData(clipping.width,clipping.height,true,0x000000);
 				}
 				bData.copyPixels(sourceBitmapData,clipping,pt);
-				
 				//add to dictionary  
-				gameAtlas[name] =scaleBitmapData(bData);  
+				if(bData.width==1&&bData.height==1){
+					//this is just saving a pixel for representing a rectangle with that pixel
+					gameAtlas[name] =bData.clone(); 
+				}else{
+					gameAtlas[name] =scaleBitmapData(bData); 
+				} 
 				
 				bData.dispose();
 				bData=null;
@@ -215,6 +224,14 @@ package com.csharks.juwalbose.utils
 		private static function createAtlas():void{
 			finalXML='<?xml version="1.0" encoding="UTF-8"?>\n<TextureAtlas imagePath="'+saveName+scaleRatio.toString()+'.png">\n';
 			finalAtlas=new BitmapData(newSize.x,newSize.y,true,0x000000);
+			if(useTextureFrames){
+				var list:XMLList=originalXML.SubTexture;
+				var frameX:int;
+				var frameY:int;
+				var frameWidth:int;
+				var frameHeight:int;
+			}
+			
 			
 			var mat:Matrix=new Matrix();
 			for (var j:int = 0; j < mPacker.rectangleCount; j++)
@@ -224,15 +241,31 @@ package com.csharks.juwalbose.utils
 				var index:int = mPacker.getRectangleId(j);
 				mat.tx=rect.x;
 				mat.ty=rect.y;
-				finalXML+=('<SubTexture name="'+lookup[index]+'" x="'+rect.x.toString()+'" y="'+rect.y.toString()+'" width="'+rect.width.toString()+'" height="'+rect.height.toString()+'"/>\n');
+				
+				if(useTextureFrames){
+					frameX=int(list.(@name==lookup[index]).@frameX)*scaleRatio;
+					frameY=int(list.(@name==lookup[index]).@frameY)*scaleRatio;
+					frameWidth=int(list.(@name==lookup[index]).@frameWidth)*scaleRatio;
+					frameHeight=int(list.(@name==lookup[index]).@frameHeight)*scaleRatio;
+					
+					if(frameWidth!=0 && frameHeight!=0){
+						finalXML+=('<SubTexture name="'+lookup[index]+'" x="'+rect.x.toString()+'" y="'+rect.y.toString()+'" width="'+rect.width.toString()+'" height="'+rect.height.toString()+'" frameX="'+frameX.toString()+'" frameY="'+frameY.toString()+'" frameWidth="'+frameWidth.toString()+'" frameHeight="'+frameHeight.toString()+'"/>\n');
+					}else{
+						finalXML+=('<SubTexture name="'+lookup[index]+'" x="'+rect.x.toString()+'" y="'+rect.y.toString()+'" width="'+rect.width.toString()+'" height="'+rect.height.toString()+'"/>\n');
+					}
+				}else{
+					finalXML+=('<SubTexture name="'+lookup[index]+'" x="'+rect.x.toString()+'" y="'+rect.y.toString()+'" width="'+rect.width.toString()+'" height="'+rect.height.toString()+'"/>\n');
+				}
 				finalAtlas.draw(gameAtlas[lookup[index]],mat);
 				(gameAtlas[lookup[index]] as BitmapData).dispose();
 				gameAtlas[lookup[index]]=rect;
 			}
 			finalXML+="</TextureAtlas>";
 			//trace(finalXML);
+			
+			/*
 			if(customAtlas){
-				customAtlas.dispose();
+			customAtlas.dispose();
 			}
 			customAtlas=Texture.fromBitmapData(finalAtlas,false);
 			
@@ -242,8 +275,11 @@ package com.csharks.juwalbose.utils
 				assets.addTexture(lookup[j],Texture.fromTexture(customAtlas,gameAtlas[lookup[j]]));
 			}
 			
-			//finalAtlas.dispose();
-			//finalAtlas=null;
+			//or
+			
+			var TA:TextureAtlas=new TextureAtlas(customAtlas,XML(finalXML));
+			assets.addTextureAtlas("Atlas",TA);
+			*/
 			
 			for(var i:String in gameAtlas){
 				gameAtlas[i]=null;

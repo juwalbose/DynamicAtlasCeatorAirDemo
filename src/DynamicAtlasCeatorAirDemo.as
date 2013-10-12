@@ -42,7 +42,7 @@ package
 	import starling.core.Starling;
 	import starling.events.Event;
 	
-	[SWF(backgroundColor = "#004400", frameRate = "30", width "100%", height = "100%")]
+	[SWF(backgroundColor = "#ffffff", frameRate = "30", width "100%", height = "100%")]
 	
 	
 	/**
