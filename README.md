@@ -9,7 +9,7 @@ https://github.com/juwalbose/DynamicAtlasCreator
 AIR version saves the created dynamic atlas into ApplicationStorageDirectory & tries to reuse it if found for all 
 subsequent runs. DynamicAtlasCreator class remains the same with just minor changes to keep the created BitmapData 
 in addition to the creation of the corresponding new XML data. Once saved these can be disposed by calling the dispose 
-method.
+method. Supports texture 'frame' as well thus creating an optimised atlas.
 
 ResourceManager class handles the saving & loading of the DynamicAtlas.
 
