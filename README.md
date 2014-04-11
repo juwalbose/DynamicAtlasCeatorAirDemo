@@ -7,19 +7,21 @@ Web version with details can be found here
 https://github.com/juwalbose/DynamicAtlasCreator
 
 AIR version saves the created dynamic atlas into ApplicationStorageDirectory & tries to reuse it if found for all 
-subsequent runs. DynamicAtlasCreator class remains the same with just minor changes to keep the created BitmapData 
-in addition to the creation of the corresponding new XML data. Once saved these can be disposed by calling the dispose 
+subsequent runs. `DynamicAtlasCreator` class remains the same with just minor changes to keep the created `BitmapData` 
+in addition to the creation of the corresponding new XML data. Once saved these can be disposed by calling the `dispose` 
 method. Supports texture 'frame' as well thus creating an optimised atlas.
 
-ResourceManager class handles the saving & loading of the DynamicAtlas.
+`ResourceManager` class handles the saving & loading of the `DynamicAtlas`.
 
-Other dependencies are Starling, AS3 Signals, TweenLite (can be removed by using Juggler instead)
+Other dependencies are [Starling](http://gamua.com/starling/), [AS3 Signals](https://github.com/robertpenner/as3-signals), [TweenLite](http://www.greensock.com/tweenlite/) (can be removed by using `Juggler` instead)
 
 Usage
 
+```actionscript
 DynamicAtlasCreator.creationComplete.add(creationComplete);//AS3 Signal will be dispatched
 
 DynamicAtlasCreator.createFrom(bitmapData,xml,scale,assets,atlasName);
+```
 
 Where 
 bitmapData > the super texture atlas image BitmapData
